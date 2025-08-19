@@ -3,6 +3,7 @@ package org.caixa.Rest;
 import jakarta.ws.rs.Path;
 
 import org.caixa.DTO.RequestSimulacaoDTO;
+import org.caixa.DTO.FiltroDTO;
 
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -22,7 +23,7 @@ public class SimulacaoRest {
 
     // Definir DTO pra saida
 
-    return Response.ok(output).build();
+    return Response.ok().build();
   }
 
   @GET
@@ -35,6 +36,6 @@ public class SimulacaoRest {
 
     // Definir DTO pra saida
 
-    return Response.ok(output).build();
+    return Response.ok().build();
   }
 }

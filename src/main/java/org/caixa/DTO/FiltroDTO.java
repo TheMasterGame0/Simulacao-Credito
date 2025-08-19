@@ -1,5 +1,10 @@
 package org.caixa.DTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
 @Builder
 @NoArgsConstructor // required for JSON deserialization
@@ -9,27 +14,4 @@ public class FiltroDTO {
   private Integer qtdRegistros;
   private Integer qtdRegistrosPagina;
 
-  public Integer getPagina() {
-    return pagina;
-  }
-
-  public void setPagina(Integer pagina) {
-    this.pagina = pagina;
-  }
-
-  public Integer getQtdRegistros() {
-    return qtdRegistros;
-  }
-
-  public void setQtdRegistros(Integer qtdRegistros) {
-    this.qtdRegistros = qtdRegistros;
-  }
-
-  public Integer getQtdRegistrosPagina() {
-    return qtdRegistrosPagina;
-  }
-
-  public void setQtdRegistrosPagina(Integer qtdRegistrosPagina) {
-    this.qtdRegistrosPagina = qtdRegistrosPagina;
-  }
 }
