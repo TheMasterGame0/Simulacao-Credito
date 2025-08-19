@@ -1,0 +1,37 @@
+package org.caixa.Rest;
+
+import jakarta.ws.rs.Path;
+
+import org.caixa.DTO.RequestSimulacaoDTO;
+
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+@Path("/api")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class SimulacaoRest {
+  
+  @GET
+  @Path("/simular")
+  public Response simular(RequestSimulacaoDTO dados) {
+    // Logica para calculo do SAC e do PRICE
+
+    // Definir DTO pra saida
+
+    return Response.ok(output).build();
+  }
+
+  @GET
+  @Path("/simulacoes")
+  public Response simulacoesAnteriores(FiltroDTO dados) {
+    // Logica para calculo do SAC e do PRICE
+
+    // Definir DTO pra saida
+
+    return Response.ok(output).build();
+  }
+}
