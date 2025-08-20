@@ -13,10 +13,11 @@ import java.math.BigDecimal;
 @Table(name = "Produto")
 public class Produto {
     @Id
+    @Column(name = "CO_PRODUTO", nullable = false)
     public Integer id;
 
     @Column(name = "NO_PRODUTO", nullable = false)
-    public String nome;
+    public String descricao;
 
     @Column(name = "PC_TAXA_JUROS", nullable = false, precision=10, scale= 9)
     public BigDecimal juros;

@@ -6,12 +6,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.caixa.DAO.ConsultaDAO;
 import org.caixa.DTO.ParcelaDTO;
 import org.caixa.DTO.RequestSimulacaoDTO;
 import org.caixa.DTO.SimulacaoDTO;
+import org.caixa.model.Produto;
 
 @ApplicationScoped
 public class SimulacaoService {
+
+  @Inject
+  ConsultaDAO consutaDao;
+
+  public Produto obterDadosProduto(RequestSimulacaoDTO dados){
+    // Validar os dados da requisicao
+    System.out.println(dados.getPrazo());
+    System.out.println(dados.getValorDesejado());
+    if(dados == null || dados.getPrazo() == null || dados.getValorDesejado() == null){
+      throw new IllegalArgumentException("Dados de simulação inválidos: prazo e valor desejado são obrigatórios.");
+    }
+
+    return consutaDao.getProduto(dados.getPrazo(), dados.getValorDesejado());
+  }
   
   public SimulacaoDTO calcularSAC(RequestSimulacaoDTO dados, BigDecimal taxa) {
     // Realizar validação dos valores enviados no dados
