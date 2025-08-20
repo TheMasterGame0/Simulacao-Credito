@@ -5,10 +5,12 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import org.caixa.DTO.ParcelaDTO;
 import org.caixa.DTO.RequestSimulacaoDTO;
 import org.caixa.DTO.SimulacaoDTO;
 
+@ApplicationScoped
 public class SimulacaoService {
   
   public SimulacaoDTO calcularSAC(RequestSimulacaoDTO dados, BigDecimal taxa) {

@@ -18,6 +18,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.metrics.annotation.Counted;
 
 @Path("/api")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -29,6 +30,7 @@ public class SimulacaoRest {
   
   @GET
   @Path("/simular")
+  @Counted(name = "qtdRequisicoesSimulacao", description = "Total de requisicoes de simulacao")
   public Response simular(RequestSimulacaoDTO dados) {
     // Recuperar do banco o valor de taxa e informações de produto
     BigDecimal taxa = new BigDecimal(0.0179);
@@ -57,6 +59,7 @@ public class SimulacaoRest {
 
   @GET
   @Path("/simulacoes")
+  @Counted(name = "qtdRequisicoesSimulacoes", description = "Total de requisicoes para visualizar simulacoes anteriores")
   public Response simulacoesAnteriores(FiltroDTO dados) {
     // Acessar o Banco local para consultar todas as simulações feitas
 
