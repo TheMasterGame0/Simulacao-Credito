@@ -2,16 +2,14 @@ package org.caixa.rest;
 
 import jakarta.ws.rs.Path;
 
-import org.caixa.DTO.RequestSimulacaoDTO;
-import org.caixa.DTO.ResponseDTO;
-import org.caixa.DTO.SimulacaoDTO;
+import org.caixa.DTO.*;
 import org.caixa.model.Produto;
+import org.caixa.model.Simulacao;
 import org.caixa.service.SimulacaoService;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
-
-import org.caixa.DTO.FiltroDTO;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -38,29 +36,40 @@ public class SimulacaoRest {
       Produto produto = simulacaoService.obterDadosProduto(dados);
 
       // Logica para calculo do SAC e do PRICE
-      SimulacaoDTO sac = simulacaoService.calcularSAC(dados, produto.juros);
-      SimulacaoDTO price = simulacaoService.calcularPRICE(dados, produto.juros);
+      TransferDTO sac = simulacaoService.calcularSAC(dados, produto.juros);
+      TransferDTO price = simulacaoService.calcularPRICE(dados, produto.juros);
+
+      // Regra de negócio -> salvar o valor Total como sendo o menor valor calculado
+      BigDecimal valorTotal = sac.getValorTotal().max(price.getValorTotal());
+
+      Simulacao simulacao = Simulacao.builder()
+              .dataSimulacao(new Date())
+              .produto(produto.id)
+              .valorDesejado(dados.getValorDesejado())
+              .valorTotalParcelas(valorTotal)
+              .prazo(dados.getPrazo())
+              .build();
+
+      Long idSimulacao = simulacaoService.salvarSimulacao(simulacao);
 
       // DTO de saida
       ResponseDTO response = ResponseDTO.builder()
-              .idSimulacao(1L)   // Precisa passar a ser recuperada do banco ao salvar a simulacao
+              .idSimulacao(idSimulacao)
               .codigoProduto(produto.id)
               .descricaoProduto(produto.descricao)
               .taxaJuros(produto.juros)
-              .resultadoSimulacao(List.of(sac, price))
+              .resultadoSimulacao(List.of(new SimulacaoDTO(sac.getSistema(), sac.getParcelas()), new SimulacaoDTO(price.getSistema(), price.getParcelas())))
               .build();
-
-      // Regra de negócio -> salvar o valor Total como sendo o menor valor calculado
-      // Possibilidade, incluir no processo de simulação opção de especificar a simulação e limitar o valor salvo
-      // Definir a Model pra saida que será enviado ao banco.
 
       return Response.ok(response).build();
     }catch(IllegalArgumentException e){
-      System.out.println("Valores invalidos passados na requisição");
+      // Os logs seriam mais adequados usando log.error
+      System.out.print("Valores invalidos passados na requisição. ");
       System.out.println(e.getMessage());
       // Aprimorar mensagem de erro e coleta de status usando .entity e um objeto com excessão personalizada
       return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
     }catch (Exception e){
+      // Os logs seriam mais adequados usando log.error
       System.out.println("Erro ao realizar simulação.");
       System.out.println(e.getMessage());
       System.out.println(e.getCause() != null ? e.getCause().getMessage() : null);

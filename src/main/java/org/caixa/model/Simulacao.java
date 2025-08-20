@@ -2,8 +2,13 @@ package org.caixa.model;
 
 import io.quarkus.agroal.DataSource;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 
 /**
@@ -21,22 +26,30 @@ import java.math.BigDecimal;
 
 @DataSource("historico")
 @Entity
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "Simulacao")
 public class Simulacao {
     @Id
     @GeneratedValue
+    @Column(name = "NU_SIMULACAO", nullable = false)
     public Long idSimulacao;
 
-    @Column(name = "tipo", nullable = false)
-    public String tipo;
+    @Column(name = "DT_SIMULACAO", nullable = false)
+    public Date dataSimulacao;
 
-    @Column(name = "valorDesejado", nullable = false, scale= 2)
+    @Column(name = "NU_PRODUTO", nullable = false)
+    public Integer produto;
+
+    @Column(name = "VR_DESEJADO", nullable = false, scale= 2)
     public BigDecimal valorDesejado;
 
-    @Column(name = "prazo", nullable = false)
+    @Column(name = "PRAZO", nullable = false)
     public Integer prazo;
 
-    @Column(name = "valorTotalParcelas", nullable = false, scale= 2)
+    @Column(name = "VR_TOTAL_PARCELAS", nullable = false, scale= 2)
     public BigDecimal valorTotalParcelas;
 
 }

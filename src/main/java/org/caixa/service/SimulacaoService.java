@@ -8,10 +8,12 @@ import java.util.List;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.caixa.DAO.ConsultaDAO;
+import org.caixa.DAO.SalvarDAO;
 import org.caixa.DTO.ParcelaDTO;
 import org.caixa.DTO.RequestSimulacaoDTO;
-import org.caixa.DTO.SimulacaoDTO;
+import org.caixa.DTO.TransferDTO;
 import org.caixa.model.Produto;
+import org.caixa.model.Simulacao;
 
 @ApplicationScoped
 public class SimulacaoService {
@@ -19,18 +21,23 @@ public class SimulacaoService {
   @Inject
   ConsultaDAO consutaDao;
 
+  @Inject
+  SalvarDAO salvarDao;
+
   public Produto obterDadosProduto(RequestSimulacaoDTO dados){
     // Validar os dados da requisicao
-    System.out.println(dados.getPrazo());
-    System.out.println(dados.getValorDesejado());
     if(dados == null || dados.getPrazo() == null || dados.getValorDesejado() == null){
       throw new IllegalArgumentException("Dados de simulação inválidos: prazo e valor desejado são obrigatórios.");
     }
-
     return consutaDao.getProduto(dados.getPrazo(), dados.getValorDesejado());
   }
+
+  public Long salvarSimulacao(Simulacao simulacao){
+    // Salvar a simulação no banco de dados
+    return salvarDao.save(simulacao);
+  }
   
-  public SimulacaoDTO calcularSAC(RequestSimulacaoDTO dados, BigDecimal taxa) {
+  public TransferDTO calcularSAC(RequestSimulacaoDTO dados, BigDecimal taxa) {
     // Realizar validação dos valores enviados no dados
 
     BigDecimal saldo = dados.getValorDesejado();
@@ -41,9 +48,9 @@ public class SimulacaoService {
     BigDecimal totalPago = new BigDecimal(0), totalJuros = new BigDecimal(0);
 
     for (int i = 1; i <= dados.getPrazo(); i++) {
-      BigDecimal juros = saldo.multiply(taxa);
-      BigDecimal valorParcela = amortizacao.add(juros);
-      saldo = saldo.subtract(amortizacao);
+      BigDecimal juros = saldo.multiply(taxa).setScale(2, RoundingMode.HALF_UP);
+      BigDecimal valorParcela = amortizacao.add(juros).setScale(2, RoundingMode.HALF_UP);
+      saldo = saldo.subtract(amortizacao).setScale(2, RoundingMode.HALF_UP);
 
       parcelas.add(ParcelaDTO.builder()
               .numero(i)
@@ -53,22 +60,21 @@ public class SimulacaoService {
               .build());
 
       totalPago = totalPago.add(valorParcela);
-      totalJuros = totalJuros.add(juros);
     }
 
     // Salvar totalPago e Juros
 
-    return SimulacaoDTO.builder()
+    return TransferDTO.builder()
           .sistema("SAC")
+          .valorTotal(totalPago)
           .parcelas(parcelas)
           .build();
   }
 
-  public SimulacaoDTO calcularPRICE(RequestSimulacaoDTO dados, BigDecimal taxa) {
+  public TransferDTO calcularPRICE(RequestSimulacaoDTO dados, BigDecimal taxa) {
     // Realizar validação dos valores enviados no dados
 
     BigDecimal saldo = dados.getValorDesejado();
-    //double r = dados.getTaxa();
     Integer prazo = dados.getPrazo();
 
     // Fórmula da parcela fixa (Price)
@@ -79,7 +85,7 @@ public class SimulacaoService {
     BigDecimal totalPago = new BigDecimal(0), totalJuros = new BigDecimal(0);
 
     for (int i = 1; i <= prazo; i++) {
-      BigDecimal juros = saldo.multiply(taxa) ;
+      BigDecimal juros = saldo.multiply(taxa).setScale(2, RoundingMode.HALF_UP) ;
       BigDecimal amortizacao = parcelaFixa.subtract(juros).setScale(2, RoundingMode.HALF_UP);
       saldo = saldo.subtract(amortizacao);
 
@@ -91,13 +97,13 @@ public class SimulacaoService {
               .build());
 
       totalPago = totalPago.add(parcelaFixa);
-      totalJuros = totalJuros.add(juros);
     }
 
     // Salvar totalPago e Juros
 
-    return SimulacaoDTO.builder()
+    return TransferDTO.builder()
           .sistema("PRICE")
+          .valorTotal(totalPago)
           .parcelas(parcelas)
           .build();
   }
