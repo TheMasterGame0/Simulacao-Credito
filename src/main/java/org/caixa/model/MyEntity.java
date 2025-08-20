@@ -1,4 +1,4 @@
-package org.caixa;
+package org.caixa.model;
 
 import io.quarkus.hibernate.orm.PersistenceUnit;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;

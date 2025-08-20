@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor // required for JSON deserialization
+@NoArgsConstructor
 @AllArgsConstructor
 public class FiltroDTO {
   private Integer pagina;
