@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: quarkus-mssql
+    environment:
+      - ACCEPT_EULA=Y
+      - HACK_PASSWORD=Password23
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.jvm
+    container_name: quarkus-app
+    depends_on:
+      - mssql
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./h2data:/app/data   # persist H2 database outside container

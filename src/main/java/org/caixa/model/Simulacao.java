@@ -30,10 +30,10 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Simulacao")
+@Table(name = "SIMULACAO")
 public class Simulacao {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "NU_SIMULACAO", nullable = false)
     public Long idSimulacao;
 

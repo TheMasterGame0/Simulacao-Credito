@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Produto")
+@Table(name = "PRODUTO")
 public class Produto {
     @Id
     @Column(name = "CO_PRODUTO", nullable = false)

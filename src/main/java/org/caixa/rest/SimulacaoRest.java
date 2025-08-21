@@ -14,10 +14,12 @@ import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 
 @Path("/api")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -27,9 +29,10 @@ public class SimulacaoRest {
   @Inject
   SimulacaoService simulacaoService;
   
-  @GET
+  @POST
   @Path("/simular")
   @Counted(name = "qtdRequisicoesSimulacao", description = "Total de requisicoes de simulacao")
+  @Operation(summary = "Simular Financiamento", description = "Simula o financiamento do valor e prazo passado pela SAC e PRICE")
   public Response simular(RequestSimulacaoDTO dados) {
     try {
       // Recuperar do banco o valor de taxa e informações de produto
@@ -83,6 +86,7 @@ public class SimulacaoRest {
   @Counted(name = "qtdRequisicoesSimulacoes", description = "Total de requisicoes para visualizar simulacoes anteriores")
   public Response simulacoesAnteriores(FiltroDTO dados) {
     // Acessar o Banco local para consultar todas as simulações feitas
+    simulacaoService.obterSimulacoes();
 
     // Definir DTO pra saida
 

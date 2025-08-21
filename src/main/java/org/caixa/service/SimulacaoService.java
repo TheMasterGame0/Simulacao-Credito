@@ -8,7 +8,7 @@ import java.util.List;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.caixa.DAO.ConsultaDAO;
-import org.caixa.DAO.SalvarDAO;
+import org.caixa.DAO.HistoricoDAO;
 import org.caixa.DTO.ParcelaDTO;
 import org.caixa.DTO.RequestSimulacaoDTO;
 import org.caixa.DTO.TransferDTO;
@@ -22,7 +22,7 @@ public class SimulacaoService {
   ConsultaDAO consutaDao;
 
   @Inject
-  SalvarDAO salvarDao;
+  HistoricoDAO historicoDao;
 
   public Produto obterDadosProduto(RequestSimulacaoDTO dados){
     // Validar os dados da requisicao
@@ -34,8 +34,12 @@ public class SimulacaoService {
 
   public Long salvarSimulacao(Simulacao simulacao){
     // Salvar a simulação no banco de dados
-    return salvarDao.save(simulacao);
+    return historicoDao.save(simulacao);
   }
+
+  public List<Simulacao> obterSimulacoes(){
+    return historicoDao.getSimulacoes();
+  } 
   
   public TransferDTO calcularSAC(RequestSimulacaoDTO dados, BigDecimal taxa) {
     // Realizar validação dos valores enviados no dados
