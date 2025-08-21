@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+import java.util.List;
+
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FiltroDTO {
-  private Integer pagina;
-  private Integer qtdRegistrosPagina;
+public class SimulacoesPorDataDTO {
+    private String dataReferencia;
+    private List<VolumeDTO> simulacoes;
 }

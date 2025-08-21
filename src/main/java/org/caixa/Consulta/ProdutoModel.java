@@ -1,4 +1,4 @@
-package org.caixa.model;
+package org.caixa.Consulta;
 
 import io.quarkus.agroal.DataSource;
 import jakarta.persistence.Column;
@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-@DataSource("default")
+@DataSource("consulta")
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "PRODUTO")
-public class Produto {
+public class ProdutoModel {
     @Id
     @Column(name = "CO_PRODUTO", nullable = false)
     public Integer id;

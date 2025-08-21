@@ -1,6 +1,7 @@
-package org.caixa.model;
+package org.caixa.Historico;
 
 import io.quarkus.agroal.DataSource;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,28 +11,13 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.Date;
 
-
-/**
- * Usage (more example on the documentation)
- * {@code
- *     public void doSomething() {
- *         MyEntity entity1 = new MyEntity();
- *         entity1.field = "field-1";
- *         entity1.persist();
- *
- *         List<MyEntity> entities = MyEntity.listAll();
- *     }
- * }
- */
-
-@DataSource("historico")
-@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @Table(name = "SIMULACAO")
-public class Simulacao {
+public class SimulacaoModel extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "NU_SIMULACAO", nullable = false)
