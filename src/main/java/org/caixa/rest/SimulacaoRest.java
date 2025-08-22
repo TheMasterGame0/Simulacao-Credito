@@ -10,8 +10,6 @@ import org.caixa.Util.DataUtil;
 import org.caixa.service.SimulacaoService;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
