@@ -1,5 +1,7 @@
 package org.caixa.Metrics;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -25,10 +27,17 @@ public class MetricsPersistence {
     @Inject
     MetricsDAO dao;
 
+    private static final List<String> NOME_METRICAS = new ArrayList<>(
+        Arrays.asList(
+        "org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacao",
+        "/api/simular_status_200",
+        "/api/simulacoes_status_200",
+        "/api/simulacoes_status_200"
+        )
+    );
+
     void onStart(@Observes StartupEvent ev) {
         List<MetricsModel> metricas = dao.findByDate(new Date());
-
-        System.out.println(metricas);
 
         // Carrega as métricas(se existirem)
         if (!metricas.isEmpty()) {
@@ -49,16 +58,16 @@ public class MetricsPersistence {
 
     @Scheduled(every = "1m") // ou "24h" para diário
     void coletarMetricas() {
-        // Exemplo: coleta de contadores por status
-        System.out.println(registry.getMetrics());
         long simularStatus200 = registry.getCounter(new MetricID("/api/simular_status_200")).getCount();
         dao.save(MetricsModel.builder().nome("/api/simular_status_200").valor(simularStatus200).data(new Date()).build());
 
 
         long simularTotal = registry.getCounter(new MetricID("org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacao")).getCount();
+
+
+
         dao.save(MetricsModel.builder().nome("org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacao").valor(simularStatus200).data(new Date()).build());
 
-        // Aqui você pode persistir em banco, arquivo, etc.
         System.out.printf("Status 200: %d | Total: %d%n", simularStatus200, simularTotal);
     }
 }
