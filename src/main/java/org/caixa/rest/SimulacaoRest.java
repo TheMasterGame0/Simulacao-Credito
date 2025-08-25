@@ -4,6 +4,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.ws.rs.*;
 
 import org.caixa.DTO.*;
+import org.caixa.Exception.ErrosPrevistoException;
 import org.caixa.Consulta.ProdutoModel;
 import org.caixa.Historico.SimulacaoModel;
 import org.caixa.Util.DataUtil;
@@ -50,8 +51,8 @@ public class SimulacaoRest {
   public Response simular(RequestSimulacaoDTO dados) {
     try {
       // Recuperar do banco o valor de taxa e informações de produto
-      //Produto produto = simulacaoService.obterDadosProduto(dados);
-      ProdutoModel produto = ProdutoModel.builder().juros(new BigDecimal(0.0179)).id(1).descricao("Produto 1").build();
+      ProdutoModel produto = simulacaoService.obterDadosProduto(dados);
+      // ProdutoModel produto = ProdutoModel.builder().juros(new BigDecimal(0.0179)).id(1).descricao("Produto 1").build();
 
       // Logica para calculo do SAC e do PRICE
       TransferDTO sac = simulacaoService.calcularSAC(dados, produto.juros);
@@ -86,6 +87,8 @@ public class SimulacaoRest {
       System.out.println(e.getMessage());
       // Aprimorar mensagem de erro e coleta de status usando .entity e um objeto com excessão personalizada
       return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
+    }catch (ErrosPrevistoException e){
+      return Response.status(e.status).entity(e.mensagem).build();
     }catch (Exception e){
       // Os logs seriam mais adequados usando log.error
       System.out.println("Erro ao realizar simulação.");

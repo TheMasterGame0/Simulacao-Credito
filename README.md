@@ -1,8 +1,34 @@
-# code-with-quarkus
+# Simulador de Credito
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+## Como Rodar a Aplicação
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+### Docker
+Para rodar a aplicação em Docker é preciso ter o Docker Desktop instalado. 
+
+A aplicação será rodada utilizando WSL que pode ser obtida seguindo o tutorial da Microsoft, disponível no link https://learn.microsoft.com/pt-br/windows/wsl/install
+
+Para rodar a aplicação é preciso:
+- Entrar nas configurações do Docker e habilitar a distribuição que tenha instalado 
+
+
+## Informações sobre o projeto
+
+Esse projeto tem como objetivo produzir uma API capaz de realizar simulações de crédito para as taxas SAC e PRICE, baseado em dados obtidos em um banco externo com taxas, prazos e valores. Os dados das simulações realizadas são guardados em um banco local utilizando H2.
+
+A API apresenta 4 enpoints que são, com suas respectivas funções:
+
+- **api/simular**: Por ele que as simulações deverão ser realizadas, retornando a simulação pela tabela PRICE e SAC.
+
+- **api/simulacoes**: Por ele que é obtida a lista de simulações já realizadas, paginadas e com o tamanho da página determinada na chamada.
+
+- **api/simulacoes-por-dia/{data}**: Por ele é possível obter um resumo de todas as simulações realizadas em um dia, divididas por produto.
+
+- **api/telemetria/{data}**: Por essa chamada será possível obter as métricas coletadas ao longo do dia de cada um dos endpoints.
+
+
+
+
+Recebe um JSON com o valor desejado e o número de parcelas. Com essas informações, são retornadas o id da simulação, o Produto utilizado com suas informações e a simulação pelo sistema SAC e PRICE. **Observação**: Dada as especificações, apenas um valor toral seria utilizado, portnato foi definido que o menor valor seria o utilizado, partindo do princípio que o usuário buscará pagar a menor quantidade de juros.
 
 ## Running the application in dev mode
 

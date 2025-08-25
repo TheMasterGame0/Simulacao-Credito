@@ -1,6 +1,5 @@
 package org.caixa.Historico;
 
-import io.quarkus.agroal.DataSource;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

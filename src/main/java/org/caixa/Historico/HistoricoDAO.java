@@ -52,7 +52,7 @@ public class HistoricoDAO {
             .append(" FROM  SIMULACAO")
             .append(" WHERE CAST(DT_SIMULACAO AS DATE) = :data")
             .append(" AND NU_PRODUTO = :produto");
-        System.out.println(data);
+
         Query query = em.createNativeQuery(sql.toString(), RegistroDTO.class);
         query.setParameter("data", data);
         query.setParameter("produto", produto);

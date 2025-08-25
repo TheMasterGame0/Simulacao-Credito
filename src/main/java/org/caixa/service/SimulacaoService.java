@@ -94,7 +94,7 @@ public class SimulacaoService {
     BigDecimal amortizacao = saldo.divide(BigDecimal.valueOf(dados.getPrazo()), 2, RoundingMode.HALF_UP);
 
     List<ParcelaDTO> parcelas = new ArrayList<>();
-    BigDecimal totalPago = new BigDecimal(0), totalJuros = new BigDecimal(0);
+    BigDecimal totalPago = new BigDecimal(0);
 
     for (int i = 1; i <= dados.getPrazo(); i++) {
       BigDecimal juros = saldo.multiply(taxa).setScale(2, RoundingMode.HALF_UP);
@@ -131,7 +131,7 @@ public class SimulacaoService {
     BigDecimal parcelaFixa = saldo.multiply(taxa).multiply(jurosCompostos).divide(jurosCompostos.subtract(BigDecimal.valueOf(1)), 2, RoundingMode.HALF_UP);
 
     List<ParcelaDTO> parcelas = new ArrayList<>();
-    BigDecimal totalPago = new BigDecimal(0), totalJuros = new BigDecimal(0);
+    BigDecimal totalPago = new BigDecimal(0);
 
     for (int i = 1; i <= prazo; i++) {
       BigDecimal juros = saldo.multiply(taxa).setScale(2, RoundingMode.HALF_UP) ;
