@@ -29,7 +29,7 @@ public class MetricsModel extends PanacheEntityBase{
   public Long id;
 
   @Column(name = "CO_NOME", nullable = false)
-  public String nome; // Trocar pra usar string
+  public String nome;
 
   @Column(name = "NU_VALOR", nullable = false)
   public Long valor;

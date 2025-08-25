@@ -104,6 +104,18 @@ public class SimulacaoRest {
   @Counted(name = "qtdRequisicoesSimulacoes", description = "Total de requisicoes para visualizar simulacoes anteriores")
   @Timed(name = "tsSimulacoes", description = "Tempo de execução da lista de simulações", unit = "milliseconds")
   @Operation(summary = "Obter Simulações Paginadas", description = "Obtem um retorno paginado das simulacoes realizadas anteriormente.\nO valor de paginação deve ser maior que 0 e a pagina deve ser maior ou igual a 1.\nO valor total fornecido é o menor valor da simulação entre SAC e PRICE.")
+  @APIResponses(
+          value = {
+                  @APIResponse(
+                          responseCode = "200",
+                          description = "Busca realizada com sucesso."
+                  ),
+                  @APIResponse(
+                          responseCode = "500",
+                          description = "Erro interno no servidor."
+                  )
+          }
+  )
   public Response simulacoesAnteriores(FiltroDTO dados) {
     try {
       SimulacoesDTO simulacoes = simulacaoService.obterSimulacoes(dados);
@@ -127,9 +139,21 @@ public class SimulacaoRest {
 
   @GET
   @Path("/simulacoes-por-dia")
-  @Counted(name = "qtdRequisicoesSimulacoesPorDia", description = "Total de requisicoes para visualizar simulacoes de um certo dia")
+  @Counted(name = "qtdRequisicoesSimulacaoPorDia", description = "Total de requisicoes para visualizar simulacoes de um certo dia")
   @Timed(name = "tsSimulacoesPorDia", description = "Tempo de execução do resumo de simulacoes de um dia", unit = "milliseconds")
   @Operation(summary = "Obter volume de simulacoes por dia", description = "Obtem um retorno com o total de valores imulados na data fornecida dividida por produto encontrado.\nA data deve ser passada no formato DD/MM/YYYY.")
+  @APIResponses(
+          value = {
+                  @APIResponse(
+                          responseCode = "200",
+                          description = "Busca realizada com sucesso."
+                  ),
+                  @APIResponse(
+                          responseCode = "500",
+                          description = "Erro interno no servidor."
+                  )
+          }
+  )
   public Response simulacoesPorProdutoPorDia(@QueryParam("data") String data) {
     try {
       SimulacoesPorDataDTO simulacoes = simulacaoService.obterSimulacoesPorDia(DataUtil.getDataFormatada(data));
@@ -162,5 +186,56 @@ public class SimulacaoRest {
     }
 
   }
+
+  @GET
+  @Path("/telemetria")
+  @Counted(name = "qtdRequisicoesTelemetriaPorDia", description = "Total de requisicoes para visualizar os dados de telemetria de um certo dia")
+  @Timed(name = "tsTelemetriaPorDia", description = "Tempo de execução da obtenção da telemetria das simulações de um dia", unit = "milliseconds")
+  @Operation(summary = "Obter dados de telemetria por dia", description = "")
+  @APIResponses(
+          value = {
+                  @APIResponse(
+                          responseCode = "200",
+                          description = "Busca realizada com sucesso."
+                  ),
+                  @APIResponse(
+                          responseCode = "500",
+                          description = "Erro interno no servidor."
+                  )
+          }
+  )
+  public Response telemetriaPorDia(@QueryParam("data") String data) {
+    try {
+      SimulacoesPorDataDTO simulacoes = simulacaoService.obterSimulacoesPorDia(DataUtil.getDataFormatada(data));
+
+      return Response.ok(simulacoes).build();
+    }catch (NoResultException e){
+      // Os logs seriam mais adequados usando log.error
+      System.out.print("Não foram encontrados resultados para a busca. ");
+      System.out.println(e.getMessage());
+
+      // Aprimorar mensagem de erro e coleta de status usando .entity e um objeto com excessão personalizada
+      return Response.status(Response.Status.NOT_FOUND.getStatusCode()).entity(e.getMessage()).build();
+
+    }
+    catch(IllegalArgumentException e){
+      // Os logs seriam mais adequados usando log.error
+      System.out.print("Valores invalidos passados na requisição. ");
+      System.out.println(e.getMessage());
+
+      // Aprimorar mensagem de erro e coleta de status usando .entity e um objeto com excessão personalizada
+      return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).entity(e.getMessage()).build();
+    }catch (Exception e){
+      // Os logs seriam mais adequados usando log.error
+      System.out.println("Erro ao obter simulações.");
+      System.out.println(e.getMessage());
+      System.out.println(e.getCause() != null ? e.getCause().getMessage() : null);
+
+      // Aprimorar mensagem de erro e coleta de status
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
+    }
+
+  }
+
 
 }

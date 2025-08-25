@@ -27,14 +27,27 @@ public class MetricsPersistence {
     @Inject
     MetricsDAO dao;
 
-    private static final List<String> NOME_METRICAS = new ArrayList<>(
+    private static final List<String> NOME_METRICAS_COUNTERS = new ArrayList<>(
         Arrays.asList(
         "org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacao",
+        "org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacoes",
+        "org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacaoPorDia",
+        "org.caixa.rest.SimulacaoRest.qtdRequisicoesTelemetriaPorDia",
         "/api/simular_status_200",
         "/api/simulacoes_status_200",
-        "/api/simulacoes_status_200"
+        "/api/simulacoes-por-dia_status_200",
+        "/api/telemetria_status_200"
         )
     );
+
+    private static final List<String> NOME_METRICAS_TIMERS = new ArrayList<>(
+            Arrays.asList(
+            "org.caixa.rest.SimulacaoRest.tsSimular",
+            "org.caixa.rest.SimulacaoRest.tsSimulacoes",
+            "org.caixa.rest.SimulacaoRest.tsSimulacoesPorDia",
+            "org.caixa.rest.SimulacaoRest.tsTelemetriaPorDia"
+            )
+        );
 
     void onStart(@Observes StartupEvent ev) {
         List<MetricsModel> metricas = dao.findByDate(new Date());
@@ -46,8 +59,13 @@ public class MetricsPersistence {
                     Counter counter = registry.getCounter(new MetricID(metrica.getNome()));
                     if(counter == null){
                         counter =  registry.counter(metrica.getNome());
+                        counter.inc(metrica.getValor());
+                    }else {
+                        long difference = metrica.getValor() - counter.getCount();
+                        if (difference > 0) {
+                            counter.inc(difference);
+                        }
                     }
-                    counter.inc(metrica.getValor());
                 }
                 System.out.println("Métricas carregadas: " + metricas);
             } catch (Exception e) {
@@ -56,18 +74,16 @@ public class MetricsPersistence {
         }
     }
 
-    @Scheduled(every = "1m") // ou "24h" para diário
+    @Scheduled(every = "1m") // Na versão definitiva deixar 30m
     void coletarMetricas() {
-        long simularStatus200 = registry.getCounter(new MetricID("/api/simular_status_200")).getCount();
-        dao.save(MetricsModel.builder().nome("/api/simular_status_200").valor(simularStatus200).data(new Date()).build());
-
-
-        long simularTotal = registry.getCounter(new MetricID("org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacao")).getCount();
-
-
-
-        dao.save(MetricsModel.builder().nome("org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacao").valor(simularStatus200).data(new Date()).build());
-
-        System.out.printf("Status 200: %d | Total: %d%n", simularStatus200, simularTotal);
+        System.out.println(registry.getMetrics());
+        Counter counter;
+        for(String id : NOME_METRICAS_COUNTERS){
+            counter = registry.getCounter(new MetricID(id));
+            if(counter!=null) {
+                dao.save(MetricsModel.builder().nome(id).valor(counter.getCount()).data(new Date()).build());
+                System.out.println("Métrica: " + id + ". Valor: " + counter.getCount());
+            }
+        }
     }
 }
