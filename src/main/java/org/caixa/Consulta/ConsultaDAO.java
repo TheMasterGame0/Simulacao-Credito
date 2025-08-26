@@ -11,8 +11,7 @@ import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.caixa.Exception.ErrorMensagem;
-import org.caixa.Exception.ErrosPrevistoException;
+import org.caixa.Exception.ErroPrevistoException;
 
 @ApplicationScoped
 @ActivateRequestContext
@@ -37,7 +36,7 @@ public class ConsultaDAO {
 
             return (ProdutoModel) query.getSingleResult();
         }catch (NoResultException e){
-            throw new ErrosPrevistoException("Os dados passados não correspondem a nenhum produto cadastrado.", 400);
+            throw new ErroPrevistoException("Os dados passados não correspondem a nenhum produto cadastrado.", 204);
         }
     }
 

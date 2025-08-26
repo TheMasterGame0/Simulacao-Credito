@@ -6,9 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.caixa.Historico.MetricsModel;
-import org.eclipse.microprofile.metrics.Counter;
-import org.eclipse.microprofile.metrics.MetricID;
-import org.eclipse.microprofile.metrics.MetricRegistry;
+import org.eclipse.microprofile.metrics.*;
 import org.eclipse.microprofile.metrics.annotation.RegistryType;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -85,5 +83,16 @@ public class MetricsPersistence {
                 System.out.println("Métrica: " + id + ". Valor: " + counter.getCount());
             }
         }
+
+        Timer timer;
+        for(String id: NOME_METRICAS_TIMERS){
+            timer = registry.getTimer(new MetricID(id));
+            if(timer!=null) {
+                Snapshot snapshot = timer.getSnapshot();
+                dao.save(MetricsModel.builder().nome(id).tsMedio(snapshot.getMean()).tsMax(snapshot.getMax()).tsMin(snapshot.getMin()).data(new Date()).build());
+                System.out.println("Métrica: " + id + ". TSMAX: " + snapshot.getMax() + ". TSMIN: " + snapshot.getMin() + ". TSMEDIO: " + snapshot.getMean());
+            }
+        }
+
     }
 }

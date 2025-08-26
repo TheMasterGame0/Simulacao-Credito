@@ -1,4 +1,4 @@
-package org.caixa.Exception;
+package org.caixa.DTO;
 
 import java.util.Date;
 
@@ -11,17 +11,17 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @NoArgsConstructor
-public class  ErrorMensagem {
+public class ErrorMensagemDTO {
 
   public String data;
   public String mensagem;
 
-  public ErrorMensagem(String mensagem) {
+  public ErrorMensagemDTO(String mensagem) {
     this.mensagem = mensagem;
     this.data = DataUtil.getDataFormatada(new Date()); 
   }
 
-  public ErrorMensagem(String data, String mensagem) {
+  public ErrorMensagemDTO(String data, String mensagem) {
     this.mensagem = mensagem;
     this.data = DataUtil.getDataFormatada(new Date()); 
   }

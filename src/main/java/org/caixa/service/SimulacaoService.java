@@ -11,9 +11,11 @@ import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
 import org.caixa.Consulta.ConsultaDAO;
 import org.caixa.DTO.*;
+import org.caixa.Exception.ErroPrevistoException;
 import org.caixa.Historico.HistoricoDAO;
 import org.caixa.Consulta.ProdutoModel;
 import org.caixa.Historico.SimulacaoModel;
+import org.caixa.Util.DataUtil;
 
 @ApplicationScoped
 public class SimulacaoService {
@@ -27,7 +29,7 @@ public class SimulacaoService {
   public ProdutoModel obterDadosProduto(RequestSimulacaoDTO dados){
     // Validar os dados da requisicao
     if(dados == null || dados.getPrazo() == null || dados.getValorDesejado() == null){
-      throw new IllegalArgumentException("Dados de simulação inválidos: prazo e valor desejado são obrigatórios.");
+      throw new ErroPrevistoException("Dados de simulação inválidos: prazo e valor desejado são obrigatórios.");
     }
     return consultaDao.getProduto(dados.getPrazo(), dados.getValorDesejado());
   }
@@ -51,15 +53,14 @@ public class SimulacaoService {
             .registros(registros).build();
   }
 
-  public SimulacoesPorDataDTO obterSimulacoesPorDia(Date data){
+  public SimulacoesPorDataDTO obterSimulacoesPorDia(String dataRecebida){
     // Validar dados
-    // Pagina >= 1
-    // qtd registrosPagina > 0
+    Date data = DataUtil.getDataFormatada(dataRecebida);
 
     List<ProdutoModel> produtos =  consultaDao.getProdutos();
 
     if (produtos == null || produtos.isEmpty()) {
-      throw new NoResultException("Nenhum produto encontrado.");
+      throw new ErroPrevistoException("Nenhum produto encontrado.", 204);
     }
 
     List<VolumeDTO> volume = new ArrayList<>();
@@ -81,9 +82,13 @@ public class SimulacaoService {
     }
 
     return SimulacoesPorDataDTO.builder()
-            .dataReferencia(data.toString())
+            .dataReferencia(DataUtil.getDataFormatada(data))
             .simulacoes(volume)
             .build();
+  }
+
+  public ResponseTelemetriaDTO obterDadosTelemetria(String data){
+    return ResponseTelemetriaDTO.builder().build();
   }
 
   public TransferDTO calcularSAC(RequestSimulacaoDTO dados, BigDecimal taxa) {

@@ -9,7 +9,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
 
-import org.caixa.Exception.ErrosPrevistoException;
+import jakarta.inject.Inject;
+import org.caixa.Exception.ErroPrevistoException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @ApplicationScoped
@@ -17,11 +18,8 @@ public class MensagemEventHub {
 
     private final EventHubProducerClient cliente;
 
-    @ConfigProperty(name = "eventhub.connection-string")
-    String dadosConexao;
-
-    public MensagemEventHub(){
-      this.cliente  = new EventHubClientBuilder().connectionString(dadosConexao).buildProducerClient();
+    public MensagemEventHub(@ConfigProperty(name = "eventhub.connection-string") String dadosConexao){
+        this.cliente  = new EventHubClientBuilder().connectionString(dadosConexao).buildProducerClient();
     }
 
     public void publicarMensagem(Object mensagem){
@@ -35,7 +33,7 @@ public class MensagemEventHub {
             return new ObjectMapper().writeValueAsString(objeto);
         }
         catch(JsonProcessingException ex){
-            throw new ErrosPrevistoException("Falha ao converter o Objeto em JSON", 500);
+            throw new ErroPrevistoException("Falha ao converter o Objeto em JSON", 500);
         }
     }
 }

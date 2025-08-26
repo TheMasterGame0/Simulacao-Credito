@@ -31,8 +31,17 @@ public class MetricsModel extends PanacheEntityBase{
   @Column(name = "CO_NOME", nullable = false)
   public String nome;
 
-  @Column(name = "NU_VALOR", nullable = false)
+  @Column(name = "NU_VALOR", nullable = true)
   public Long valor;
+
+  @Column(name = "NU_TS_MIN", nullable = true)
+  public Long tsMin;
+
+  @Column(name = "NU_TS_MAX", nullable = true)
+  public Long tsMax;
+
+  @Column(name = "NU_TS_MEDIO", nullable = true)
+  public Double tsMedio;
 
   @Column(name = "DT_METRICA", nullable = false)
   public Date data;
