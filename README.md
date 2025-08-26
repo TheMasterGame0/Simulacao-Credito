@@ -10,6 +10,11 @@ A aplicação será rodada utilizando WSL que pode ser obtida seguindo o tutoria
 Para rodar a aplicação é preciso:
 - Entrar nas configurações do Docker e habilitar a distribuição que tenha instalado;
 - Entrar pelo terminal até a pasta raiz do projeto (Simulacao-Credito);
+- Criar o arquivo .env com os valores da senha do banco mssql e do link de acesso ao eventhub. O aqruivo ficcara similar a:
+
+EVENTHUB_CONNECTION_STRING=link_Conexao
+HACK_PASSWORD=senha_banco
+
 - Executar o comando:
 ```shell script
 docker compose up -d --build
