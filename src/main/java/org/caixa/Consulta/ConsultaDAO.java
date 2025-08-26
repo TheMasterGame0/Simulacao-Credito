@@ -37,7 +37,7 @@ public class ConsultaDAO {
 
             return (ProdutoModel) query.getSingleResult();
         }catch (NoResultException e){
-            throw new ErrosPrevistoException(ErrorMensagem.builder().mensagem("Os dados passados não correspondem a nenhum produto cadastrado.").build(), 400);
+            throw new ErrosPrevistoException("Os dados passados não correspondem a nenhum produto cadastrado.", 400);
         }
     }
 

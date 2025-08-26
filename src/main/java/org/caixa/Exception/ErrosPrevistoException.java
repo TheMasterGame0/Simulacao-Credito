@@ -18,8 +18,8 @@ public class ErrosPrevistoException extends RuntimeException {
         super(mensagem, causa);
     }
 
-    public ErrosPrevistoException(ErrorMensagem mensagem,int status) {
-        this.mensagem = mensagem;
+    public ErrosPrevistoException(String mensagem,int status) {
+        this.mensagem = ErrorMensagem.builder().mensagem(mensagem).build();
         this.status = status;
     }
 }

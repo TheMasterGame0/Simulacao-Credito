@@ -8,8 +8,12 @@ Para rodar a aplicação em Docker é preciso ter o Docker Desktop instalado.
 A aplicação será rodada utilizando WSL que pode ser obtida seguindo o tutorial da Microsoft, disponível no link https://learn.microsoft.com/pt-br/windows/wsl/install
 
 Para rodar a aplicação é preciso:
-- Entrar nas configurações do Docker e habilitar a distribuição que tenha instalado 
-
+- Entrar nas configurações do Docker e habilitar a distribuição que tenha instalado;
+- Entrar pelo terminal até a pasta raiz do projeto (Simulacao-Credito);
+- Executar o comando:
+```shell script
+docker compose up -d --build
+```
 
 ## Informações sobre o projeto
 
@@ -34,9 +38,6 @@ Recebe um JSON com o valor desejado e o número de parcelas. Com essas informaç
 
 You can run your application in dev mode that enables live coding using:
 
-```shell script
-./mvnw quarkus:dev
-```
 
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 

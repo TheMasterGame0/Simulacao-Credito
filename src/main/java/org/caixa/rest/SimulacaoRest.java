@@ -7,6 +7,7 @@ import org.caixa.DTO.*;
 import org.caixa.Exception.ErrosPrevistoException;
 import org.caixa.Consulta.ProdutoModel;
 import org.caixa.Historico.SimulacaoModel;
+import org.caixa.Mensageria.MensagemEventHub;
 import org.caixa.Util.DataUtil;
 import org.caixa.service.SimulacaoService;
 
@@ -30,6 +31,9 @@ public class SimulacaoRest {
 
   @Inject
   SimulacaoService simulacaoService;
+
+  @Inject
+  MensagemEventHub eventHub;
   
   @POST
   @Path("/simular")
@@ -70,6 +74,9 @@ public class SimulacaoRest {
               .build();
 
       Long idSimulacao = simulacaoService.salvarSimulacao(simulacao);
+
+      // Enviar mensagem para o Event Hub
+      eventHub.publicarMensagem(simulacao);
 
       // DTO de saida
       ResponseDTO response = ResponseDTO.builder()

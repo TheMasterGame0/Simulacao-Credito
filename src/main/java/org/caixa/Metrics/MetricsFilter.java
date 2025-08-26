@@ -27,7 +27,7 @@ public class MetricsFilter implements ContainerResponseFilter {
         String path = requestContext.getUriInfo().getPath();
         Counter counter = registry.getCounter(new MetricID(path+"_status_" + statusCode));
         if(counter == null){
-           counter =  registry.counter(new MetricID(path+"_status_" + statusCode));
+           counter =  registry.counter(new MetricID(path+"_status_"+statusCode));
         }
         counter.inc();
 

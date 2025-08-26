@@ -41,13 +41,13 @@ public class MetricsPersistence {
     );
 
     private static final List<String> NOME_METRICAS_TIMERS = new ArrayList<>(
-            Arrays.asList(
-            "org.caixa.rest.SimulacaoRest.tsSimular",
-            "org.caixa.rest.SimulacaoRest.tsSimulacoes",
-            "org.caixa.rest.SimulacaoRest.tsSimulacoesPorDia",
-            "org.caixa.rest.SimulacaoRest.tsTelemetriaPorDia"
-            )
-        );
+        Arrays.asList(
+        "org.caixa.rest.SimulacaoRest.tsSimular",
+        "org.caixa.rest.SimulacaoRest.tsSimulacoes",
+        "org.caixa.rest.SimulacaoRest.tsSimulacoesPorDia",
+        "org.caixa.rest.SimulacaoRest.tsTelemetriaPorDia"
+        )
+    );
 
     void onStart(@Observes StartupEvent ev) {
         List<MetricsModel> metricas = dao.findByDate(new Date());
@@ -58,7 +58,7 @@ public class MetricsPersistence {
                 for(MetricsModel metrica : metricas) {
                     Counter counter = registry.getCounter(new MetricID(metrica.getNome()));
                     if(counter == null){
-                        counter =  registry.counter(metrica.getNome());
+                        counter = registry.counter(metrica.getNome());
                         counter.inc(metrica.getValor());
                     }else {
                         long difference = metrica.getValor() - counter.getCount();
