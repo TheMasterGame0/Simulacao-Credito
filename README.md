@@ -39,7 +39,6 @@ HACK_PASSWORD=senha_banco
 - Executar os comandos:
 ```shell script
 ./mvnw clean install
-export $(cat .env | xargs)
 ./mnvw quarkus:dev
 ```
 
@@ -47,7 +46,6 @@ ou
 
 ```shell script
 mvn clean install
-export $(cat .env | xargs)
 mvn quarkus:dev
 ```
 
@@ -72,10 +70,16 @@ A API apresenta 4 enpoints que são:
   - **Observação**: Dada as especificações, apenas um valor toral seria utilizado, portanto foi definido que o menor valor seria o utilizado, partindo do princípio que o usuário buscará pagar a menor quantidade de juros.
 
 - **api/simulacoes**: Por ele que é obtida a lista de simulações já realizadas, paginadas e com o tamanho da página determinada na chamada.
+  - Recebe um JSON com o valor da pagina e o número de simulações por página. O valor da página inicia em 1 e o valor de simulações por página deve ser maior que 0.
+  - Retorna .
 
 - **api/simulacoes-por-dia/{data}**: Por ele é possível obter um resumo de todas as simulações realizadas em um dia, divididas por produto.
+  - Recebe um JSON com a data no formato dd/mm/yyyy.
+  - Retorna .
 
 - **api/telemetria/{data}**: Por essa chamada será possível obter as métricas coletadas ao longo do dia de cada um dos endpoints.
+  - Recebe um JSON com a data no formato dd/mm/yyyy.
+  - Retorna .
 
 ### REST
 
