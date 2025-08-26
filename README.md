@@ -13,6 +13,7 @@ Para rodar a aplicação é preciso:
 - Criar o arquivo .env com os valores da senha do banco mssql e do link de acesso ao eventhub. O aqruivo ficcara similar a:
 
 EVENTHUB_CONNECTION_STRING=link_Conexao
+
 HACK_PASSWORD=senha_banco
 
 - Executar o comando:
