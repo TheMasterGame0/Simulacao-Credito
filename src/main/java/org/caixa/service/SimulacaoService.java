@@ -24,6 +24,8 @@ import org.eclipse.microprofile.metrics.annotation.RegistryType;
 
 import javax.swing.text.html.Option;
 
+import static org.caixa.Util.DataUtil.getDataFormatada;
+
 @ApplicationScoped
 public class SimulacaoService {
 
@@ -63,7 +65,11 @@ public class SimulacaoService {
   public ProdutoModel obterDadosProduto(RequestSimulacaoDTO dados){
     // Validar os dados da requisicao
     if(dados == null || dados.getPrazo() == null || dados.getValorDesejado() == null){
-      throw new ErroPrevistoException("Dados de simulação inválidos: prazo e valor desejado são obrigatórios.", 400);
+      throw new ErroPrevistoException("Dados de simulação inválidos: prazo e valor desejado são obrigatórios.");
+    }else if (dados.getPrazo() <= 0){
+      throw new ErroPrevistoException("Dados de simulação inválidos: prazo deve ser maior que 0");
+    }else if (dados.getValorDesejado().compareTo(new BigDecimal(0)) != 1){
+      throw new ErroPrevistoException("Dados de simulação inválidos: valorDesejado deve ser maior que 0");
     }
     return consultaDao.getProduto(dados.getPrazo(), dados.getValorDesejado());
   }
@@ -75,8 +81,11 @@ public class SimulacaoService {
 
   public SimulacoesDTO obterSimulacoes(FiltroDTO filtro){
     // Validar dados
-    // Pagina >= 1
-    // qtd registrosPagina > 0
+    if(filtro.getPagina() < 1){
+      throw  new ErroPrevistoException("Dados passados inválidos: O número deve ser maior que 0");
+    }else if(filtro.getQtdRegistrosPagina()<1){
+      throw  new ErroPrevistoException("Dados passados inválidos: O número de registros por página deve ser maior que 0");
+    }
 
     Long totalRegistros = historicoDao.getTotalResgitstros();
     List<RegistroDTO> registros = historicoDao.getSimulacoes(filtro);
@@ -88,9 +97,8 @@ public class SimulacaoService {
   }
 
   public SimulacoesPorDataDTO obterSimulacoesPorDia(String dataRecebida){
-    // Validar dados
-    Date data = DataUtil.getDataFormatada(dataRecebida);
-
+    // Valida data
+    Date data = getDataFormatada(dataRecebida);
     List<ProdutoModel> produtos =  consultaDao.getProdutos();
 
     if (produtos == null || produtos.isEmpty()) {
@@ -116,7 +124,7 @@ public class SimulacaoService {
     }
 
     return SimulacoesPorDataDTO.builder()
-            .dataReferencia(DataUtil.getDataFormatada(data))
+            .dataReferencia(getDataFormatada(data))
             .simulacoes(volume)
             .build();
   }
@@ -124,9 +132,11 @@ public class SimulacaoService {
   public ResponseTelemetriaDTO obterDadosTelemetria(String data){
     List<TelemetriaDTO> telemetria = new ArrayList<>();
     List<MetricsModel> metricas;
+    //Valida data
+    Date date = DataUtil.getDataFormatada(data);
     
     for(List<String> endpoint : endpoints){
-      metricas = metricsDao.findByEndpointByDate(endpoint, DataUtil.getDataFormatada(data));
+      metricas = metricsDao.findByEndpointByDate(endpoint, date);
 
       Optional<Long> tsMax = metricas.stream().filter(m -> m.nome.equals(endpoint.get(3))).map(MetricsModel::getTsMax).findFirst();
       Optional<Long> tsMin = metricas.stream().filter(m -> m.nome.equals(endpoint.get(3))).map(MetricsModel::getTsMin).findFirst();
@@ -146,17 +156,17 @@ public class SimulacaoService {
         if(counter!=null) {
           dto.setPercentualSucesso((float) (counter.getCount()) / qtdRequisicoes);
         }
-
         telemetria.add(dto);
-
       }
     }
-    
     return ResponseTelemetriaDTO.builder().data(data).endpoints(telemetria).build();
   }
 
   public TransferDTO calcularSAC(RequestSimulacaoDTO dados, BigDecimal taxa) {
-    // Realizar validação dos valores enviados no dados
+    // Realizar validação
+    if (taxa.compareTo(new BigDecimal(0)) != 1) {
+      throw new ErroPrevistoException("A taxa obtida possui um valor inválido, contate um administrador", 500);
+    }
 
     BigDecimal saldo = dados.getValorDesejado();
     // Amortizacao constante
@@ -190,7 +200,10 @@ public class SimulacaoService {
   }
 
   public TransferDTO calcularPRICE(RequestSimulacaoDTO dados, BigDecimal taxa) {
-    // Realizar validação dos valores enviados no dados
+    // Realizar validação
+    if (taxa.compareTo(new BigDecimal(0)) != 1) {
+      throw new ErroPrevistoException("A taxa obtida possui um valor inválido, contate um administrador", 500);
+    }
 
     BigDecimal saldo = dados.getValorDesejado();
     Integer prazo = dados.getPrazo();

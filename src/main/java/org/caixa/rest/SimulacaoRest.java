@@ -22,6 +22,8 @@ import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.hibernate.JDBCException;
+import org.hibernate.exception.JDBCConnectionException;
 
 @Path("/api")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -44,6 +46,14 @@ public class SimulacaoRest {
       @APIResponse(
         responseCode = "200",
         description = "Simulação realizada com sucesso."
+      ),
+      @APIResponse(
+        responseCode = "204",
+        description = "Produtos não encontrados."
+      ),
+      @APIResponse(
+        responseCode = "400",
+        description = "Dados passadas estão incorretas."
       ),
       @APIResponse(
         responseCode = "500",
@@ -88,20 +98,15 @@ public class SimulacaoRest {
               .build();
 
       return Response.ok(response).build();
-    }catch(IllegalArgumentException e){
-      // Os logs seriam mais adequados usando log.error
-      System.out.print("Valores invalidos passados na requisição. ");
-      System.out.println(e.getMessage());
-      // Aprimorar mensagem de erro e coleta de status usando .entity e um objeto com excessão personalizada
-      return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
     }catch (ErroPrevistoException e){
       return Response.status(e.status).entity(e.mensagem).build();
+    }catch (JDBCException e){
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ErrorMensagemDTO.builder().mensagem("Falha na conexão com o banco").build()).build();
     }catch (Exception e){
       // Os logs seriam mais adequados usando log.error
       System.out.println("Erro ao realizar simulação.");
       System.out.println(e.getMessage());
       System.out.println(e.getCause() != null ? e.getCause().getMessage() : null);
-      // Aprimorar mensagem de erro e coleta de status
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
     }
   }
@@ -118,6 +123,10 @@ public class SimulacaoRest {
         description = "Busca realizada com sucesso."
       ),
       @APIResponse(
+        responseCode = "400",
+        description = "Dados passados estão incorretos"
+      ),
+      @APIResponse(
         responseCode = "500",
         description = "Erro interno no servidor."
       )
@@ -127,18 +136,13 @@ public class SimulacaoRest {
     try {
       SimulacoesDTO simulacoes = simulacaoService.obterSimulacoes(dados);
       return Response.ok(simulacoes).build();
-    }catch(IllegalArgumentException e){
-      // Os logs seriam mais adequados usando log.error
-      System.out.print("Valores invalidos passados na requisição. ");
-      System.out.println(e.getMessage());
-      // Aprimorar mensagem de erro e coleta de status usando .entity e um objeto com excessão personalizada
-      return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).build();
+    }catch(ErroPrevistoException e){
+      return Response.status(e.status).entity(e.mensagem).build();
     }catch (Exception e){
       // Os logs seriam mais adequados usando log.error
       System.out.println("Erro ao obter simulações.");
       System.out.println(e.getMessage());
       System.out.println(e.getCause() != null ? e.getCause().getMessage() : null);
-      // Aprimorar mensagem de erro e coleta de status
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
     }
 
@@ -156,6 +160,14 @@ public class SimulacaoRest {
                           description = "Busca realizada com sucesso."
                   ),
                   @APIResponse(
+                          responseCode = "204",
+                          description = "Produtos não encontrados."
+                  ),
+                  @APIResponse(
+                          responseCode = "400",
+                          description = "Dados passados estão incorretos"
+                  ),
+                  @APIResponse(
                           responseCode = "500",
                           description = "Erro interno no servidor."
                   )
@@ -169,28 +181,12 @@ public class SimulacaoRest {
     }catch (ErroPrevistoException e){
       return Response.status(e.status).entity(e.mensagem).build();
     }catch (NoResultException e){
-      // Os logs seriam mais adequados usando log.error
-      System.out.print("Não foram encontrados resultados para a busca. ");
-      System.out.println(e.getMessage());
-
-      // Aprimorar mensagem de erro e coleta de status usando .entity e um objeto com excessão personalizada
       return Response.status(Response.Status.NOT_FOUND.getStatusCode()).entity(e.getMessage()).build();
-
-    }
-    catch(IllegalArgumentException e){
-      // Os logs seriam mais adequados usando log.error
-      System.out.print("Valores invalidos passados na requisição. ");
-      System.out.println(e.getMessage());
-
-      // Aprimorar mensagem de erro e coleta de status usando .entity e um objeto com excessão personalizada
-      return Response.status(Response.Status.BAD_REQUEST.getStatusCode()).entity(e.getMessage()).build();
     }catch (Exception e){
       // Os logs seriam mais adequados usando log.error
       System.out.println("Erro ao obter simulações.");
       System.out.println(e.getMessage());
       System.out.println(e.getCause() != null ? e.getCause().getMessage() : null);
-
-      // Aprimorar mensagem de erro e coleta de status
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
     }
 
@@ -206,6 +202,9 @@ public class SimulacaoRest {
       @APIResponse(
         responseCode = "200",
         description = "Busca realizada com sucesso."
+      ),@APIResponse(
+            responseCode = "400",
+            description = "Dados passados estão incorretos"
       ),
       @APIResponse(
         responseCode = "500",
@@ -225,8 +224,6 @@ public class SimulacaoRest {
       System.out.println("Erro ao obter simulações.");
       System.out.println(e.getMessage());
       System.out.println(e.getCause() != null ? e.getCause().getMessage() : null);
-
-      // Aprimorar mensagem de erro e coleta de status
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
     }
   }

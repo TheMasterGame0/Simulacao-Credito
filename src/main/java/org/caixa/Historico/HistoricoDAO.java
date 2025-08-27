@@ -2,12 +2,11 @@ package org.caixa.Historico;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.ActivateRequestContext;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import org.caixa.DTO.FiltroDTO;
 import org.caixa.DTO.RegistroDTO;
+import org.caixa.Exception.ErroPrevistoException;
 
 import java.util.Date;
 import java.util.List;
@@ -40,10 +39,16 @@ public class HistoricoDAO {
     }
 
     public Long getTotalResgitstros(){
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT  COUNT(*)")
-                .append(" FROM  SIMULACAO");
-        return (Long) em.createNativeQuery(sql.toString()).getSingleResult();
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("SELECT  COUNT(*)")
+                    .append(" FROM  SIMULACAO");
+            return (Long) em.createNativeQuery(sql.toString()).getSingleResult();
+        }catch (NoResultException e){
+            return null;
+        }catch (NonUniqueResultException e){
+            throw new ErroPrevistoException("Falha ao obter o total de simulações realizadas", 500);
+        }
     }
 
     public List<RegistroDTO> getSimulacoesPorDiaPorProduto(Date data, Integer produto) {

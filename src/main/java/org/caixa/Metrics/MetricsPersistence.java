@@ -70,7 +70,7 @@ public class MetricsPersistence {
         }
     }
 
-    @Scheduled(every = "1m") // Na versão definitiva deixar 30m
+    @Scheduled(every = "30m")
     void coletarMetricas() {
         Counter counter;
         MetricsModel metrica;
@@ -86,7 +86,7 @@ public class MetricsPersistence {
                     metrica.setId(idEncontrado.get());
                 }
                 dao.save(metrica);
-                System.out.println("Métrica: " + id + ". Valor: " + counter.getCount());
+                //System.out.println("Métrica: " + id + ". Valor: " + counter.getCount());
             }
         }
 
@@ -117,8 +117,7 @@ public class MetricsPersistence {
                          .data(new Date())
                          .build());
                  }
-                
-                 System.out.println("Métrica: "+ id +". TSMAX: "+ tsMax +". TSMIN: "+ tsMin+". TSMEDIO: "+ tsMedio);
+                 //System.out.println("Métrica: "+ id +". TSMAX: "+ tsMax +". TSMIN: "+ tsMin+". TSMEDIO: "+ tsMedio);
              }
          }
 
