@@ -73,18 +73,14 @@ A API apresenta 4 enpoints que são:
 
 - **api/simulacoes**: Por ele que é obtida a lista de simulações já realizadas, paginadas e com o tamanho da página determinada na chamada.
   - Recebe um JSON com o valor da pagina e o número de simulações por página. O valor da página inicia em 1 e o valor de simulações por página deve ser maior que 0.
-  - Retorna .
+  - Retorna a pagina, quantidade por pagina, total de simulações no banaco e a lista de simulações resumidas, com id, valor desejado, prazo e valor total das parcelas.
 
 - **api/simulacoes-por-dia/{data}**: Por ele é possível obter um resumo de todas as simulações realizadas em um dia, divididas por produto.
   - Recebe um JSON com a data no formato dd/mm/yyyy.
-  - Retorna .
+  - Retorna a data passa e uma lista com cada produto e sua descrição, o total de valor desejado em cada um e total de valor que será pago.
 
 - **api/telemetria/{data}**: Por essa chamada será possível obter as métricas coletadas ao longo do dia de cada um dos endpoints.
   - Recebe um JSON com a data no formato dd/mm/yyyy.
-  - Retorna .
+  - Retorna a data consultada, e a lista de endpoints e suas respectivas métricas (qtdRequisicao, tempoMinimo, tempoMedio, tempoMaximo).
+  - **Observação**: Os valores de telemetria são salvos a cada 30 minutos e os valores retornados pela API (com excessão do total de requisições e percentual de sucesso) serão referentes ao ultimo save, se for solicitado no mesmo dia atual.
 
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)

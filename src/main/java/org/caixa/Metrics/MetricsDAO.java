@@ -69,9 +69,6 @@ public class MetricsDAO {
         .append(" WHERE CAST(DT_METRICA AS DATE) = CAST(:data AS DATE)")
         .append(" AND CO_NOME IN (:id1, :id2, :id3)");
 
-        System.out.println(endpoint.stream()
-                           .map(e -> e)
-                           .collect(Collectors.joining(", ")));
     Query query = em.createNativeQuery(sql.toString(), MetricsModel.class);
     query.setParameter("data", data);
     query.setParameter("id1", endpoint.get(1));

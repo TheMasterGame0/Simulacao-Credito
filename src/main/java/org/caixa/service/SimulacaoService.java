@@ -2,10 +2,8 @@ package org.caixa.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -18,10 +16,13 @@ import org.caixa.Consulta.ProdutoModel;
 import org.caixa.Historico.SimulacaoModel;
 import org.caixa.Metrics.MetricsDAO;
 import org.caixa.Util.DataUtil;
+import org.eclipse.microprofile.metrics.Counter;
 import org.eclipse.microprofile.metrics.MetricID;
 import org.eclipse.microprofile.metrics.MetricRegistry;
 import org.eclipse.microprofile.metrics.Timer;
 import org.eclipse.microprofile.metrics.annotation.RegistryType;
+
+import javax.swing.text.html.Option;
 
 @ApplicationScoped
 public class SimulacaoService {
@@ -122,29 +123,32 @@ public class SimulacaoService {
 
   public ResponseTelemetriaDTO obterDadosTelemetria(String data){
     List<TelemetriaDTO> telemetria = new ArrayList<>();
-    List<MetricsModel> metricas = new ArrayList<>();
+    List<MetricsModel> metricas;
     
     for(List<String> endpoint : endpoints){
       metricas = metricsDao.findByEndpointByDate(endpoint, DataUtil.getDataFormatada(data));
-      System.out.println(metricas);
 
-      // if(metricas.isEmpty()){
-      //   throw new ErroPrevistoException("Nenhuma métrica encontrada para a data informada.", 204);
-      // }
+      Optional<Long> tsMax = metricas.stream().filter(m -> m.nome.equals(endpoint.get(3))).map(MetricsModel::getTsMax).findFirst();
+      Optional<Long> tsMin = metricas.stream().filter(m -> m.nome.equals(endpoint.get(3))).map(MetricsModel::getTsMin).findFirst();
+      Optional<Double> tsMedio = metricas.stream().filter(m -> m.nome.equals(endpoint.get(3))).map(MetricsModel::getTsMedio).findFirst();
 
-      Timer timer = registry.getTimer(new MetricID(endpoint.get(3)));
+      Counter counter = registry.getCounter(new MetricID(endpoint.get(2)));
       Long qtdRequisicoes = registry.getCounter(new MetricID(endpoint.get(1))).getCount();
       
       if(qtdRequisicoes > 0){
-        System.out.println(TelemetriaDTO.builder()
+        TelemetriaDTO dto = TelemetriaDTO.builder()
         .nomeApi(endpoint.get(0))
         .qtdRequisicoes(qtdRequisicoes)
-        .tempoMaximo(Math.round(timer.getSnapshot().getMax()/1000000))
-        .tempoMinimo(Math.round(timer.getSnapshot().getMin()/1000000))
-        .tempoMedio(Math.round((float) timer.getSnapshot().getMean()/1000000))
-        // Arrumar para evitar exceção ao método nunca ter um 200
-        .percentualSucesso((float) (registry.getCounter(new MetricID(endpoint.get(2))).getCount())/qtdRequisicoes)
-        .build());
+        .tempoMaximo(tsMax.orElse(null))
+        .tempoMinimo(tsMin.orElse(null))
+        .tempoMedio(tsMedio.orElse(null))
+        .build();
+        if(counter!=null) {
+          dto.setPercentualSucesso((float) (counter.getCount()) / qtdRequisicoes);
+        }
+
+        telemetria.add(dto);
+
       }
     }
     

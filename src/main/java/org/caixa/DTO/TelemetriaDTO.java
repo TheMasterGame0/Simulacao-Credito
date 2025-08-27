@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class TelemetriaDTO {
     private String nomeApi;
     private Long qtdRequisicoes;
-    private Integer tempoMedio;
-    private Integer tempoMinimo;
-    private Integer tempoMaximo;
+    private Double tempoMedio;
+    private Long tempoMinimo;
+    private Long tempoMaximo;
     private Float percentualSucesso;
 }
