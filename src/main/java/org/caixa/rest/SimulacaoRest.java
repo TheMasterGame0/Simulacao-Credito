@@ -23,7 +23,6 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.hibernate.JDBCException;
-import org.hibernate.exception.JDBCConnectionException;
 
 @Path("/api")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -196,7 +195,7 @@ public class SimulacaoRest {
   @Path("/telemetria")
   @Counted(name = "qtdRequisicoesTelemetriaPorDia", description = "Total de requisicoes para visualizar os dados de telemetria de um certo dia")
   @Timed(name = "tsTelemetriaPorDia", description = "Tempo de execução da obtenção da telemetria das simulações de um dia", unit = "milliseconds")
-  @Operation(summary = "Obter dados de telemetria por dia", description = "")
+  @Operation(summary = "Obter dados de telemetria por dia", description = "A data deve ser passada no formato DD/MM/YYYY")
   @APIResponses(
     value = {
       @APIResponse(
