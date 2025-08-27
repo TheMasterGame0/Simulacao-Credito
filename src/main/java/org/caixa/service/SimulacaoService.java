@@ -3,19 +3,25 @@ package org.caixa.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.persistence.NoResultException;
 import org.caixa.Consulta.ConsultaDAO;
 import org.caixa.DTO.*;
 import org.caixa.Exception.ErroPrevistoException;
 import org.caixa.Historico.HistoricoDAO;
+import org.caixa.Historico.MetricsModel;
 import org.caixa.Consulta.ProdutoModel;
 import org.caixa.Historico.SimulacaoModel;
+import org.caixa.Metrics.MetricsDAO;
 import org.caixa.Util.DataUtil;
+import org.eclipse.microprofile.metrics.MetricID;
+import org.eclipse.microprofile.metrics.MetricRegistry;
+import org.eclipse.microprofile.metrics.Timer;
+import org.eclipse.microprofile.metrics.annotation.RegistryType;
 
 @ApplicationScoped
 public class SimulacaoService {
@@ -26,10 +32,37 @@ public class SimulacaoService {
   @Inject
   HistoricoDAO historicoDao;
 
+  @Inject
+  MetricsDAO metricsDao;
+
+  @Inject
+  @RegistryType(type = MetricRegistry.Type.APPLICATION)
+  MetricRegistry registry;
+
+
+  private static final List<List<String>> endpoints = new ArrayList<>(Arrays.asList(
+      Arrays.asList("Simular",
+                    "org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacao",
+                    "/api/simular_status_200",
+                    "org.caixa.rest.SimulacaoRest.tsSimular"), 
+      Arrays.asList("Simulacoes",
+                    "org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacoes",
+                    "/api/simulacoes_status_200",
+                    "org.caixa.rest.SimulacaoRest.tsSimulacoes"),
+      Arrays.asList("SimulacoesPorDia",
+                    "org.caixa.rest.SimulacaoRest.qtdRequisicoesSimulacaoPorDia",
+                    "/api/simulacoes_por_dia_status_200",
+                    "org.caixa.rest.SimulacaoRest.tsSimulacoesPorDia"),
+      Arrays.asList("TelemetriaPorDia",
+                    "org.caixa.rest.SimulacaoRest.qtdRequisicoesTelemetriaPorDia",
+                    "/api/telemetria_status_200",
+                    "org.caixa.rest.SimulacaoRest.tsTelemetriaPorDia")
+    ));
+
   public ProdutoModel obterDadosProduto(RequestSimulacaoDTO dados){
     // Validar os dados da requisicao
     if(dados == null || dados.getPrazo() == null || dados.getValorDesejado() == null){
-      throw new ErroPrevistoException("Dados de simulação inválidos: prazo e valor desejado são obrigatórios.");
+      throw new ErroPrevistoException("Dados de simulação inválidos: prazo e valor desejado são obrigatórios.", 400);
     }
     return consultaDao.getProduto(dados.getPrazo(), dados.getValorDesejado());
   }
@@ -88,7 +121,34 @@ public class SimulacaoService {
   }
 
   public ResponseTelemetriaDTO obterDadosTelemetria(String data){
-    return ResponseTelemetriaDTO.builder().build();
+    List<TelemetriaDTO> telemetria = new ArrayList<>();
+    List<MetricsModel> metricas = new ArrayList<>();
+    
+    for(List<String> endpoint : endpoints){
+      metricas = metricsDao.findByEndpointByDate(endpoint, DataUtil.getDataFormatada(data));
+      System.out.println(metricas);
+
+      // if(metricas.isEmpty()){
+      //   throw new ErroPrevistoException("Nenhuma métrica encontrada para a data informada.", 204);
+      // }
+
+      Timer timer = registry.getTimer(new MetricID(endpoint.get(3)));
+      Long qtdRequisicoes = registry.getCounter(new MetricID(endpoint.get(1))).getCount();
+      
+      if(qtdRequisicoes > 0){
+        System.out.println(TelemetriaDTO.builder()
+        .nomeApi(endpoint.get(0))
+        .qtdRequisicoes(qtdRequisicoes)
+        .tempoMaximo(Math.round(timer.getSnapshot().getMax()/1000000))
+        .tempoMinimo(Math.round(timer.getSnapshot().getMin()/1000000))
+        .tempoMedio(Math.round((float) timer.getSnapshot().getMean()/1000000))
+        // Arrumar para evitar exceção ao método nunca ter um 200
+        .percentualSucesso((float) (registry.getCounter(new MetricID(endpoint.get(2))).getCount())/qtdRequisicoes)
+        .build());
+      }
+    }
+    
+    return ResponseTelemetriaDTO.builder().data(data).endpoints(telemetria).build();
   }
 
   public TransferDTO calcularSAC(RequestSimulacaoDTO dados, BigDecimal taxa) {

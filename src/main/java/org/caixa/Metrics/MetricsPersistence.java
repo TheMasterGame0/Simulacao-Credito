@@ -33,7 +33,7 @@ public class MetricsPersistence {
         "org.caixa.rest.SimulacaoRest.qtdRequisicoesTelemetriaPorDia",
         "/api/simular_status_200",
         "/api/simulacoes_status_200",
-        "/api/simulacoes-por-dia_status_200",
+        "/api/simulacoes_por_dia_status_200",
         "/api/telemetria_status_200"
         )
     );
@@ -54,18 +54,16 @@ public class MetricsPersistence {
         if (!metricas.isEmpty()) {
             try {
                 for(MetricsModel metrica : metricas) {
-                    Counter counter = registry.getCounter(new MetricID(metrica.getNome()));
-                    if(counter == null){
-                        counter = registry.counter(metrica.getNome());
-                        counter.inc(metrica.getValor());
-                    }else {
+                    if(!NOME_METRICAS_TIMERS.contains(metrica)){
+                        // retorna um counter ja existente ou cria um novo (caso não exista)
+                        Counter counter = registry.counter(new MetricID(metrica.getNome()));
                         long difference = metrica.getValor() - counter.getCount();
                         if (difference > 0) {
                             counter.inc(difference);
                         }
                     }
                 }
-                System.out.println("Métricas carregadas: " + metricas);
+                System.out.println("Métricas carregadas!");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -84,15 +82,35 @@ public class MetricsPersistence {
             }
         }
 
-        Timer timer;
-        for(String id: NOME_METRICAS_TIMERS){
-            timer = registry.getTimer(new MetricID(id));
-            if(timer!=null) {
-                Snapshot snapshot = timer.getSnapshot();
-                dao.save(MetricsModel.builder().nome(id).tsMedio(snapshot.getMean()).tsMax(snapshot.getMax()).tsMin(snapshot.getMin()).data(new Date()).build());
-                System.out.println("Métrica: " + id + ". TSMAX: " + snapshot.getMax() + ". TSMIN: " + snapshot.getMin() + ". TSMEDIO: " + snapshot.getMean());
-            }
-        }
+        // Timer timer;
+        // for(String id: NOME_METRICAS_TIMERS){
+        //     MetricsModel metrica = dao.findByMetricaByDate(id, new Date());
+            
+        //     timer = registry.getTimer(new MetricID(id));
+        //     if(timer!=null) {
+        //         Snapshot snapshot = timer.getSnapshot();
+        //         Long tsMax = snapshot.getMax()/1000000;
+        //         Long tsMin = snapshot.getMin()/1000000;
+        //         Double tsMedio = snapshot.getMean()/1000000;
+
+        //         if(metrica != null){
+        //             metrica.setTsMax(Math.max(metrica.getTsMax(),tsMax));
+        //             metrica.setTsMin(Math.min(metrica.getTsMin(),tsMin));
+        //             metrica.setTsMedio((metrica.getTsMedio() + tsMedio)/2);
+        //             dao.save(metrica);           
+        //         }else{
+        //             dao.save(MetricsModel.builder()
+        //                 .nome(id)
+        //                 .tsMedio(tsMedio)
+        //                 .tsMax(tsMax)
+        //                 .tsMin(tsMin)
+        //                 .data(new Date())
+        //                 .build());
+        //         }
+                
+        //         System.out.println("Métrica: "+ id +". TSMAX: "+ tsMax +". TSMIN: "+ tsMin+". TSMEDIO: "+ tsMedio);
+        //     }
+        // }
 
     }
 }

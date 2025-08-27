@@ -40,23 +40,23 @@ public class SimulacaoRest {
   @Timed(name = "tsSimular", description = "Tempo de execução da simulação", unit = "milliseconds")
   @Operation(summary = "Simular Financiamento", description = "Simula o financiamento do valor e prazo passado pela SAC e PRICE")
   @APIResponses(
-      value = {
-        @APIResponse(
-            responseCode = "200",
-            description = "Simulação realizada com sucesso."
-        ),
-        @APIResponse(
-            responseCode = "500",
-            description = "Erro interno no servidor."
-        )
-      }
+    value = {
+      @APIResponse(
+        responseCode = "200",
+        description = "Simulação realizada com sucesso."
+      ),
+      @APIResponse(
+        responseCode = "500",
+        description = "Erro interno no servidor."
+      )
+    }
   )
   public Response simular(RequestSimulacaoDTO dados) {
     try {
       // Recuperar do banco o valor de taxa e informações de produto
-      // ProdutoModel produto = simulacaoService.obterDadosProduto(dados);
+      ProdutoModel produto = simulacaoService.obterDadosProduto(dados);
       // Para testes sem o banco:
-      ProdutoModel produto = ProdutoModel.builder().juros(new BigDecimal(0.0179)).id(1).descricao("Produto 1").build();
+      // ProdutoModel produto = ProdutoModel.builder().juros(new BigDecimal(0.0179)).id(1).descricao("Produto 1").build();
 
       // Logica para calculo do SAC e do PRICE
       TransferDTO sac = simulacaoService.calcularSAC(dados, produto.juros);
@@ -76,7 +76,7 @@ public class SimulacaoRest {
       Long idSimulacao = simulacaoService.salvarSimulacao(simulacao);
 
       // Enviar mensagem para o Event Hub
-      //eventHub.publicarMensagem(simulacao);
+      eventHub.publicarMensagem(simulacao);
 
       // DTO de saida
       ResponseDTO response = ResponseDTO.builder()
@@ -112,16 +112,16 @@ public class SimulacaoRest {
   @Timed(name = "tsSimulacoes", description = "Tempo de execução da lista de simulações", unit = "milliseconds")
   @Operation(summary = "Obter Simulações Paginadas", description = "Obtem um retorno paginado das simulacoes realizadas anteriormente.\nO valor de paginação deve ser maior que 0 e a pagina deve ser maior ou igual a 1.\nO valor total fornecido é o menor valor da simulação entre SAC e PRICE.")
   @APIResponses(
-          value = {
-                  @APIResponse(
-                          responseCode = "200",
-                          description = "Busca realizada com sucesso."
-                  ),
-                  @APIResponse(
-                          responseCode = "500",
-                          description = "Erro interno no servidor."
-                  )
-          }
+    value = {
+      @APIResponse(
+        responseCode = "200",
+        description = "Busca realizada com sucesso."
+      ),
+      @APIResponse(
+        responseCode = "500",
+        description = "Erro interno no servidor."
+      )
+    }
   )
   public Response simulacoesAnteriores(FiltroDTO dados) {
     try {
@@ -202,16 +202,16 @@ public class SimulacaoRest {
   @Timed(name = "tsTelemetriaPorDia", description = "Tempo de execução da obtenção da telemetria das simulações de um dia", unit = "milliseconds")
   @Operation(summary = "Obter dados de telemetria por dia", description = "")
   @APIResponses(
-          value = {
-                  @APIResponse(
-                          responseCode = "200",
-                          description = "Busca realizada com sucesso."
-                  ),
-                  @APIResponse(
-                          responseCode = "500",
-                          description = "Erro interno no servidor."
-                  )
-          }
+    value = {
+      @APIResponse(
+        responseCode = "200",
+        description = "Busca realizada com sucesso."
+      ),
+      @APIResponse(
+        responseCode = "500",
+        description = "Erro interno no servidor."
+      )
+    }
   )
   public Response telemetriaPorDia(@QueryParam("data") String data) {
     try {
@@ -229,8 +229,5 @@ public class SimulacaoRest {
       // Aprimorar mensagem de erro e coleta de status
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()).build();
     }
-
   }
-
-
 }

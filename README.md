@@ -22,8 +22,9 @@ docker compose up -d --build
 ```
 - Com isso as dependências serão baixadas e a aplicação iniciará no localhost pela porta 8080. Alguns links uteis são: 
 
-  -  **Swagger**: http://localhost:8080/q/swagger-ui
+  - **Swagger**: http://localhost:8080/q/swagger-ui
   - **Health Checker**: http://localhost:8080/q/health-ui
+  - **Metricas**: http://localhost:8080/q/metrics
 
 ### Localmente
 
@@ -53,8 +54,9 @@ dependendo da maneira como foi instalado o maven.
 
 - Com isso as dependências serão baixadas e a aplicação iniciará no localhost pela porta 8080. Alguns links uteis são:
 
-    -  **Swagger**: http://localhost:8080/q/swagger-ui
-    - **Health Checker**: http://localhost:8080/q/health-ui
+  - **Swagger**: http://localhost:8080/q/swagger-ui
+  - **Health Checker**: http://localhost:8080/q/health-ui
+  - **Metricas**: http://localhost:8080/q/metrics
 
 
 ## Informações sobre o projeto

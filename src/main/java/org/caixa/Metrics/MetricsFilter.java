@@ -30,6 +30,5 @@ public class MetricsFilter implements ContainerResponseFilter {
            counter =  registry.counter(new MetricID(path+"_status_"+statusCode));
         }
         counter.inc();
-
     }
 }

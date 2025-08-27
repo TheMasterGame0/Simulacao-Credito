@@ -17,10 +17,6 @@ public class ErroPrevistoException extends RuntimeException {
         this.status = 400; // Definir status padrão
     }
 
-    public ErroPrevistoException(String mensagem, Throwable causa) {
-        super(mensagem, causa);
-    }
-
     public ErroPrevistoException(String mensagem, int status) {
         this.mensagem = ErrorMensagemDTO.builder().mensagem(mensagem).build();
         this.status = status;
